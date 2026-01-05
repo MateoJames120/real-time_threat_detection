@@ -8,6 +8,7 @@ import sys
 import threading
 import time
 import json
+import re
 from datetime import datetime
 from collections import defaultdict, deque
 
@@ -85,8 +86,26 @@ class ThreatDetector:
             logger.error(f"Error tailing {log_file}: {e}")
     
     def analyze_log_entry(self, entry, log_file):
-        """Analyze log entry for suspicious patterns"""
-        pass
+        """Analyze log entry for suspicious patterns"""                
+        suspicious_patterns = [
+            (r'Failed password', 'Failed SSH login'),
+            (r'authentication failure', 'Authentication failure'),
+            (r'Invalid user', 'Invalid user attempt'),
+            (r'POSSIBLE BREAK-IN ATTEMPT', 'Break-in attempt'),
+            (r'port scan', 'Port scan detected'),
+            (r'kernel:.*firewall.*DROP', 'Firewall block'),
+            (r'root.*sudo.*ALL', 'Root privilege escalation')
+        ]
+        
+        for pattern, description in suspicious_patterns:
+            if re.search(pattern, entry, re.IGNORECASE):
+                self.alert(f"{description}: {entry.strip()}", "LOG_ANALYSIS")
+                break
+        
+        # Check for malicious patterns in commands
+        for pattern in self.detection_rules['malicious_patterns']:
+            if re.search(pattern, entry, re.IGNORECASE):
+                self.alert(f"Malicious pattern in logs: {entry.strip()}", "MALICIOUS_COMMAND")
 
     def monitor_network_traffic(self):
         pass
@@ -96,7 +115,10 @@ class ThreatDetector:
 
     def scan_filesystem(self):
         pass
-
+    
+    def alert(self, message, alert_type):
+        """Generate alert for suspicious activity"""
+        
     def generate_report(self):
         """Generate threat detection report"""
         report = {
