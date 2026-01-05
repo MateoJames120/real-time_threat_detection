@@ -72,7 +72,21 @@ class ThreatDetector:
 
     def tail_log(self, log_file):
         """Tail a log file for real-time monitoring"""
-
+        try:
+            with open(log_file, 'r') as f:
+                f.seek(0, 2)  # Go to end of file
+                while self.running:
+                    line = f.readline()
+                    if not line:
+                        time.sleep(0.1)
+                        continue
+                    self.analyze_log_entry(line, log_file)
+        except Exception as e:
+            logger.error(f"Error tailing {log_file}: {e}")
+    
+    def analyze_log_entry(self, entry, log_file):
+        """Analyze log entry for suspicious patterns"""
+        pass
 
     def monitor_network_traffic(self):
         pass
