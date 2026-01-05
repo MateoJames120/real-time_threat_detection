@@ -53,6 +53,18 @@ class ThreatDetector:
             
         return CONFIG['signatures']
 
+    def monitor_system_logs(self):
+        pass
+
+    def monitor_network_traffic(self):
+        pass
+
+    def monitor_processes(self):
+        pass
+
+    def scan_filesystem(self):
+        pass
+    
     def generate_report(self):
         """Generate threat detection report"""
         report = {
