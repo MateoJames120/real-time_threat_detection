@@ -7,10 +7,32 @@ import os
 import sys
 import threading
 import time
+import json
 from collections import deque
 
 # Configuration
-CONFIG = { }
+CONFIG = {
+    'signatures': {
+        'malicious_patterns': [
+            r'rm -rf /',
+            r'chmod 777',
+            r'wget.*http://',
+            r'curl.*http://',
+            r'base64.*decode',
+            r'eval\(.*\)',
+            r'exec\(.*\)',
+            r'system\(.*\)',
+            r'subprocess\.call',
+            r'\/dev\/tcp\/',
+            r'\/dev\/udp\/'
+        ],
+        'suspicious_processes': [
+            'minerd', 'cpuminer', 'xmrig', 'ccminer',
+            'nc', 'ncat', 'socat', 'netcat',
+            'tcpdump', 'wireshark', 'tshark'
+        ]
+    }
+}
 
 class ThreatDetector:
     def __init__(self):
@@ -20,7 +42,13 @@ class ThreatDetector:
         self.running = True
 
     def load_rules(self):
-        pass
+        """Load detection rules from file or default"""
+        rules_file = 'detection_rules.json'
+        if os.path.exists(rules_file):
+            with open(rules_file, 'r') as f:                
+                return json.load(f)
+            
+        return CONFIG['signatures']
 
     def generate_report(self):
         """Generate threat detection report"""

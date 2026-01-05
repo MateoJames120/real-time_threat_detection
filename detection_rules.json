@@ -1,0 +1,15 @@
+{
+  "malicious_patterns": [
+    "rm -rf /",
+    "chmod 777",
+    "wget.*http://",
+    "curl.*http://",
+    "base64.*decode"
+  ],
+  "suspicious_processes": [
+    "minerd",
+    "xmrig",
+    "nc",
+    "ncat"
+  ]
+}
