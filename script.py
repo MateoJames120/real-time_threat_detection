@@ -8,7 +8,10 @@ import sys
 import threading
 import time
 import json
-from collections import deque
+from datetime import datetime
+from collections import defaultdict, deque
+
+import psutil
 
 # Configuration
 CONFIG = {
@@ -52,7 +55,29 @@ class ThreatDetector:
 
     def generate_report(self):
         """Generate threat detection report"""
-        pass
+        report = {
+            'timestamp': datetime.now().isoformat(),
+            'total_alerts': len(self.suspicious_events),
+            'alerts_by_type': defaultdict(int),
+            'recent_alerts': list(self.suspicious_events)[-10:],
+            'system_info': {
+                'hostname': os.uname().nodename,
+                'uptime': psutil.boot_time(),
+                'cpu_usage': psutil.cpu_percent(),
+                'memory_usage': psutil.virtual_memory().percent
+            }
+        }
+        
+        for alert in self.suspicious_events:
+            report['alerts_by_type'][alert['type']] += 1
+
+        report_file = f'threat_report_{datetime.now().strftime("%Y%m%d_%H%M%S")}.json'
+        with open(report_file, 'w') as f:
+            json.dump(report, f, indent=2, default=str)
+        
+        logger.info(f"Report generated: {report_file}")
+        return report
+
 
     def start(self):
         """Start all monitoring threads"""
