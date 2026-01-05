@@ -54,7 +54,25 @@ class ThreatDetector:
         return CONFIG['signatures']
 
     def monitor_system_logs(self):
-        pass
+        """Monitor system logs in real-time"""
+        log_files = [
+            '/var/log/syslog', 
+            '/var/log/auth.log',
+            '/var/log/secure',
+            '/var/log/messages'
+        ]
+
+        for log_file in log_files:
+            if os.path.exists(log_file):
+                threading.Thread(
+                    target=self.tail_log, 
+                    args=(log_file,), 
+                    daemon=True
+                ).start()
+
+    def tail_log(self, log_file):
+        """Tail a log file for real-time monitoring"""
+
 
     def monitor_network_traffic(self):
         pass
@@ -64,7 +82,7 @@ class ThreatDetector:
 
     def scan_filesystem(self):
         pass
-    
+
     def generate_report(self):
         """Generate threat detection report"""
         report = {
